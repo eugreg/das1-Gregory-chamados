@@ -1,0 +1,18 @@
+meta {
+  name: categorias
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/categorias
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nome": "Suporte Técnico",
+    "descricao": "Categoria destinada a chamados relacionados a problemas técnicos, falhas no sistema e dificuldades de acesso."
+  }
+}

@@ -1,0 +1,19 @@
+meta {
+  name: greg
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/clientes
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nome": "João da Silva",
+    "email": "joao.silva@email.com",
+    "telefone": "(47) 99999-1234"
+  }
+}
