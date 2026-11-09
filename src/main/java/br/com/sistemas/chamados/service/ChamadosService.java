@@ -2,6 +2,7 @@ package br.com.sistemas.chamados.service;
 
 import br.com.sistemas.chamados.dto.AlterarStatusRequest;
 import br.com.sistemas.chamados.dto.AtribuirTecnicoRequest;
+import br.com.sistemas.chamados.dto.ChamadosDetalheResponse;
 import br.com.sistemas.chamados.dto.ChamadosRequest;
 import br.com.sistemas.chamados.dto.ChamadosResponse;
 import br.com.sistemas.chamados.entity.ChamadosEntity;
@@ -72,8 +73,8 @@ public class ChamadosService {
                 .toList();
     }
 
-    public ChamadosResponse buscar(Long id) {
-        return ChamadosResponse.de(buscarEntity(id));
+    public ChamadosDetalheResponse buscar(Long id) {
+        return ChamadosDetalheResponse.de(buscarEntity(id));
     }
 
     public ChamadosResponse atualizar(Long id, ChamadosRequest request) {

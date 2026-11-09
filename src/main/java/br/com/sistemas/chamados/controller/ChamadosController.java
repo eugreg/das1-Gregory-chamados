@@ -3,10 +3,15 @@ package br.com.sistemas.chamados.controller;
 
 import br.com.sistemas.chamados.dto.AlterarStatusRequest;
 import br.com.sistemas.chamados.dto.AtribuirTecnicoRequest;
+import br.com.sistemas.chamados.dto.ChamadosDetalheResponse;
 import br.com.sistemas.chamados.dto.ChamadosRequest;
 import br.com.sistemas.chamados.dto.ChamadosResponse;
+import br.com.sistemas.chamados.dto.ComentarioRequest;
+import br.com.sistemas.chamados.dto.ComentarioResponse;
 import br.com.sistemas.chamados.service.ChamadosService;
+import br.com.sistemas.chamados.service.ComentarioService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,9 +23,11 @@ import java.util.List;
 public class ChamadosController {
 
     private final ChamadosService chamadosService;
+    private final ComentarioService comentarioService;
 
-    public ChamadosController(ChamadosService chamadosService) {
+    public ChamadosController(ChamadosService chamadosService, ComentarioService comentarioService) {
         this.chamadosService = chamadosService;
+        this.comentarioService = comentarioService;
     }
 
     @PostMapping
@@ -40,8 +47,16 @@ public class ChamadosController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ChamadosResponse> buscar(@PathVariable Long id) {
+    public ResponseEntity<ChamadosDetalheResponse> buscar(@PathVariable Long id) {
         return ResponseEntity.ok(chamadosService.buscar(id));
+    }
+
+    @PostMapping("/{id}/comentarios")
+    public ResponseEntity<ComentarioResponse> comentar(
+            @PathVariable Long id,
+            @Valid @RequestBody ComentarioRequest request) {
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(comentarioService.adicionar(id, request));
     }
 
     @PutMapping("/{id}")
