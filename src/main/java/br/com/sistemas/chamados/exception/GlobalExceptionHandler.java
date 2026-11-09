@@ -22,6 +22,16 @@ public class GlobalExceptionHandler {
         return montar(HttpStatus.CONFLICT, ex.getMessage(), List.of());
     }
 
+    @ExceptionHandler(ChamadoFechadoException.class)
+    public ResponseEntity<ErroResposta> chamadoFechado(ChamadoFechadoException ex) {
+        return montar(HttpStatus.CONFLICT, ex.getMessage(), List.of());
+    }
+
+    @ExceptionHandler(TransicaoStatusInvalidaException.class)
+    public ResponseEntity<ErroResposta> transicaoInvalida(TransicaoStatusInvalidaException ex) {
+        return montar(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(), List.of());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErroResposta> validacao(MethodArgumentNotValidException ex) {
         List<String> detalhes = ex.getBindingResult().getFieldErrors().stream().map(e -> e.getField() + ":" + e.getDefaultMessage()).toList();
