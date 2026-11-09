@@ -1,8 +1,8 @@
-
 package br.com.sistemas.chamados.controller;
 
 import br.com.sistemas.chamados.dto.AlterarStatusRequest;
 import br.com.sistemas.chamados.dto.AtribuirTecnicoRequest;
+import br.com.sistemas.chamados.dto.ChamadosFiltro;
 import br.com.sistemas.chamados.dto.ChamadosDetalheResponse;
 import br.com.sistemas.chamados.dto.ChamadosRequest;
 import br.com.sistemas.chamados.dto.ChamadosResponse;
@@ -11,12 +11,14 @@ import br.com.sistemas.chamados.dto.ComentarioResponse;
 import br.com.sistemas.chamados.service.ChamadosService;
 import br.com.sistemas.chamados.service.ComentarioService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/chamados")
@@ -42,8 +44,11 @@ public class ChamadosController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ChamadosResponse>> listar() {
-        return ResponseEntity.ok(chamadosService.listar());
+    public ResponseEntity<PagedModel<ChamadosResponse>> listar(
+            ChamadosFiltro filtro,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+
+        return ResponseEntity.ok(new PagedModel<>(chamadosService.listar(filtro, pageable)));
     }
 
     @GetMapping("/{id}")

@@ -18,7 +18,7 @@ public class TecnicoEntity {
     private String email;
 
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false)
     private PerfilEnum perfil;
 
     public TecnicoEntity() {
