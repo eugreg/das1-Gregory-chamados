@@ -1,6 +1,7 @@
-
 package br.com.sistemas.chamados.service;
 
+import br.com.sistemas.chamados.dto.AlterarStatusRequest;
+import br.com.sistemas.chamados.dto.AtribuirTecnicoRequest;
 import br.com.sistemas.chamados.dto.ChamadosRequest;
 import br.com.sistemas.chamados.dto.ChamadosResponse;
 import br.com.sistemas.chamados.entity.ChamadosEntity;
@@ -8,7 +9,9 @@ import br.com.sistemas.chamados.entity.ClienteEntity;
 import br.com.sistemas.chamados.entity.CategoriasEntity;
 import br.com.sistemas.chamados.entity.TecnicoEntity;
 import br.com.sistemas.chamados.enums.StatusChamado;
+import br.com.sistemas.chamados.exception.ChamadoFechadoException;
 import br.com.sistemas.chamados.exception.RecursoNaoEncontradoException;
+import br.com.sistemas.chamados.exception.TransicaoStatusInvalidaException;
 import br.com.sistemas.chamados.repository.ChamadosRepository;
 import br.com.sistemas.chamados.repository.ClienteRepository;
 import br.com.sistemas.chamados.repository.CategoriasRepository;
@@ -54,7 +57,7 @@ public class ChamadosService {
                 categoria,
                 StatusChamado.ABERTO,
                 request.prioridade(),
-                request.dataFechamento()
+                null
         );
 
         ChamadosEntity salvo = chamadosRepository.save(chamado);
@@ -75,6 +78,7 @@ public class ChamadosService {
 
     public ChamadosResponse atualizar(Long id, ChamadosRequest request) {
         ChamadosEntity chamado = buscarEntity(id);
+        validarNaoFechado(chamado);
 
         ClienteEntity cliente = buscarCliente(request.clienteId());
         CategoriasEntity categoria = buscarCategoria(request.categoriaId());
@@ -83,14 +87,47 @@ public class ChamadosService {
         chamado.setTitulo(request.titulo());
         chamado.setDescricao(request.descricao());
         chamado.setDataAbertura(request.dataAbertura());
-        chamado.setDataFechamento(request.dataFechamento());
         chamado.setPrioridade(request.prioridade());
-        chamado.setStatus(request.status());
         chamado.setCliente(cliente);
         chamado.setCateforia(categoria);
         chamado.setTecnico(tecnico);
 
         return ChamadosResponse.de(chamado);
+    }
+
+    public ChamadosResponse atribuirTecnico(Long id, AtribuirTecnicoRequest request) {
+        ChamadosEntity chamado = buscarEntity(id);
+        validarNaoFechado(chamado);
+
+        chamado.setTecnico(buscarTecnico(request.tecnicoId()));
+
+        return ChamadosResponse.de(chamado);
+    }
+
+    public ChamadosResponse alterarStatus(Long id, AlterarStatusRequest request) {
+        ChamadosEntity chamado = buscarEntity(id);
+        validarNaoFechado(chamado);
+
+        StatusChamado atual = chamado.getStatus();
+        StatusChamado destino = request.status();
+
+        if (!atual.podeIrPara(destino)) {
+            throw new TransicaoStatusInvalidaException(atual, destino);
+        }
+
+        chamado.setStatus(destino);
+
+        if (destino == StatusChamado.FECHADO) {
+            chamado.setDataFechamento(LocalDate.now());
+        }
+
+        return ChamadosResponse.de(chamado);
+    }
+
+    private void validarNaoFechado(ChamadosEntity chamado) {
+        if (chamado.getStatus() == StatusChamado.FECHADO) {
+            throw new ChamadoFechadoException(chamado.getId());
+        }
     }
 
     public void excluir(Long id) {
