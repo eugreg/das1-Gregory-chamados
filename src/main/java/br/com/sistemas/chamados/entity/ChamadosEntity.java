@@ -5,6 +5,8 @@ import br.com.sistemas.chamados.enums.StatusChamado;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "chamados")
@@ -33,6 +35,10 @@ public class ChamadosEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private TecnicoEntity tecnico;
+
+    @OneToMany(mappedBy = "chamado", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("dataCriacao ASC")
+    private List<ComentarioEntity> comentarios = new ArrayList<>();
 
     public ChamadosEntity() {
     }
@@ -127,5 +133,15 @@ public class ChamadosEntity {
 
     public void setTecnico(TecnicoEntity tecnico) {
         this.tecnico = tecnico;
+    }
+
+    public List<ComentarioEntity> getComentarios() {
+        return comentarios;
+    }
+
+    public ComentarioEntity adicionarComentario(String texto, String autor) {
+        ComentarioEntity comentario = new ComentarioEntity(texto, autor, this);
+        comentarios.add(comentario);
+        return comentario;
     }
 }

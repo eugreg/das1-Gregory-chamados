@@ -26,7 +26,7 @@ public class ClienteService {
         if (clienteRepository.existsByEmail(clienteRequest.email()))
             throw new RegraNegocioException("Ja existe cliente com e-mail " + clienteRequest.email());
 
-        ClienteEntity clienteEntity = new ClienteEntity(clienteRequest.nome(), clienteRequest.email(), clienteRequest.telefone());
+        ClienteEntity clienteEntity = new ClienteEntity(clienteRequest.email(), clienteRequest.nome(), clienteRequest.telefone());
         ClienteEntity salvo = clienteRepository.save(clienteEntity);
 
         return ClienteResponse.de(salvo);
