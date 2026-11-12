@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR"
+      th:with="fechado=${chamado.status().name() == 'FECHADO'}">
+<head th:replace="~{fragments :: head(${chamado.titulo()})}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main class="conteudo">
+    <div th:replace="~{fragments :: alertas}"></div>
+
+    <a class="voltar" th:href="@{/web/chamados}">← Chamados</a>
+
+    <div class="topo">
+        <h1 th:text="|#${chamado.id()} ${chamado.titulo()}|"></h1>
+        <div class="acoes">
+            <a class="botao botao-secundario" th:unless="${fechado}"
+               th:href="@{/web/chamados/{id}/editar(id=${chamado.id()})}">Editar</a>
+            <form th:action="@{/web/chamados/{id}/excluir(id=${chamado.id()})}" method="post"
+                  onsubmit="return confirm('Excluir este chamado?')">
+                <button class="botao botao-perigo" type="submit">Excluir</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="duas-colunas">
+        <section class="cartao">
+            <p class="descricao" th:text="${chamado.descricao()}"></p>
+            <dl class="dados">
+                <dt>Status</dt><dd><span th:replace="~{fragments :: status(${chamado.status()})}"></span></dd>
+                <dt>Prioridade</dt><dd><span th:replace="~{fragments :: prioridade(${chamado.prioridade()})}"></span></dd>
+                <dt>Cliente</dt>
+                <dd><a th:href="@{/web/clientes/{id}(id=${chamado.clienteId()})}"
+                       th:text="${nomesClientes[chamado.clienteId()]}"></a></dd>
+                <dt>Categoria</dt><dd th:text="${nomesCategorias[chamado.categoriaId()]}"></dd>
+                <dt>Técnico</dt><dd th:text="${nomesTecnicos[chamado.tecnicoId()] ?: '—'}"></dd>
+                <dt>Abertura</dt><dd th:text="${#temporals.format(chamado.dataAbertura(), 'dd/MM/yyyy')}"></dd>
+                <dt>Fechamento</dt>
+                <dd th:text="${chamado.dataFechamento() != null ? #temporals.format(chamado.dataFechamento(), 'dd/MM/yyyy') : '—'}"></dd>
+            </dl>
+        </section>
+
+        <aside class="cartao" th:unless="${fechado}">
+            <h2>Alterar status</h2>
+            <div class="acoes">
+                <form th:each="s : ${transicoes}" th:action="@{/web/chamados/{id}/status(id=${chamado.id()})}" method="post">
+                    <input type="hidden" name="status" th:value="${s}">
+                    <button class="botao botao-secundario" type="submit" th:text="${s}"></button>
+                </form>
+            </div>
+
+            <h2>Atribuir técnico</h2>
+            <form class="formulario" th:action="@{/web/chamados/{id}/atribuir(id=${chamado.id()})}" method="post">
+                <select name="tecnicoId" required>
+                    <option th:each="t : ${tecnicos}" th:value="${t.id()}" th:text="${t.nome()}"
+                            th:selected="${t.id() == chamado.tecnicoId()}"></option>
+                </select>
+                <button class="botao" type="submit">Atribuir</button>
+            </form>
+        </aside>
+
+        <aside class="cartao" th:if="${fechado}">
+            <h2>Chamado fechado</h2>
+            <p class="vazio">Chamados fechados não podem ser alterados.</p>
+        </aside>
+    </div>
+
+    <section class="cartao">
+        <h2>Comentários</h2>
+        <p class="vazio" th:if="${chamado.comentarios().isEmpty()}">Nenhum comentário ainda.</p>
+        <ul class="comentarios">
+            <li th:each="c : ${chamado.comentarios()}">
+                <div class="comentario-cabecalho">
+                    <strong th:text="${c.autor()}"></strong>
+                    <span th:text="${#temporals.format(c.dataCriacao(), 'dd/MM/yyyy HH:mm')}"></span>
+                </div>
+                <p th:text="${c.texto()}"></p>
+            </li>
+        </ul>
+
+        <form class="formulario" th:action="@{/web/chamados/{id}/comentarios(id=${chamado.id()})}" method="post">
+            <label>Autor<input name="autor" maxlength="100" required></label>
+            <label>Comentário<textarea name="texto" rows="3" maxlength="1000" required></textarea></label>
+            <div class="acoes">
+                <button class="botao" type="submit">Comentar</button>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

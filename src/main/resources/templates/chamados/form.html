@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR"
+      th:with="edicao=${chamado != null}">
+<head th:replace="~{fragments :: head(${chamado != null ? 'Editar chamado' : 'Abrir chamado'})}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main class="conteudo estreito">
+    <div th:replace="~{fragments :: alertas}"></div>
+
+    <a class="voltar" th:if="${edicao}" th:href="@{/web/chamados/{id}(id=${chamado.id()})}">← Chamado</a>
+    <a class="voltar" th:unless="${edicao}" th:href="@{/web/chamados}">← Chamados</a>
+    <h1 th:text="${edicao ? 'Editar chamado #' + chamado.id() : 'Abrir chamado'}"></h1>
+
+    <form class="cartao formulario" method="post"
+          th:action="${edicao} ? @{/web/chamados/{id}(id=${chamado.id()})} : @{/web/chamados}">
+        <input type="hidden" name="dataAbertura" th:if="${edicao}" th:value="${chamado.dataAbertura()}">
+
+        <label>Título<input name="titulo" maxlength="255" required th:value="${chamado?.titulo()}"></label>
+        <label>Descrição<textarea name="descricao" rows="4" required th:text="${chamado?.descricao()}"></textarea></label>
+
+        <div class="colunas">
+            <label>Prioridade
+                <select name="prioridade" required>
+                    <option th:each="p : ${prioridades}" th:value="${p}" th:text="${p}"
+                            th:selected="${edicao and p == chamado.prioridade()}"></option>
+                </select>
+            </label>
+            <label>Cliente
+                <select name="clienteId" required>
+                    <option value="">Selecione</option>
+                    <option th:each="c : ${clientes}" th:value="${c.id()}" th:text="${c.nome()}"
+                            th:selected="${edicao and c.id() == chamado.clienteId()}"></option>
+                </select>
+            </label>
+            <label>Categoria
+                <select name="categoriaId" required>
+                    <option value="">Selecione</option>
+                    <option th:each="c : ${categorias}" th:value="${c.id()}" th:text="${c.nome()}"
+                            th:selected="${edicao and c.id() == chamado.categoriaId()}"></option>
+                </select>
+            </label>
+            <label>Técnico
+                <select name="tecnicoId" required>
+                    <option value="">Selecione</option>
+                    <option th:each="t : ${tecnicos}" th:value="${t.id()}" th:text="${t.nome()}"
+                            th:selected="${edicao and t.id() == chamado.tecnicoId()}"></option>
+                </select>
+            </label>
+        </div>
+
+        <div class="acoes">
+            <button class="botao" type="submit" th:text="${edicao ? 'Salvar' : 'Abrir chamado'}"></button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

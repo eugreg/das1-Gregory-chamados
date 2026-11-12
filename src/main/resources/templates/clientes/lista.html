@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: head('Clientes')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main class="conteudo">
+    <div th:replace="~{fragments :: alertas}"></div>
+
+    <h1>Clientes</h1>
+
+    <section class="cartao">
+        <h2>Novo cliente</h2>
+        <form class="formulario em-linha" th:action="@{/web/clientes}" method="post">
+            <label>Nome<input name="nome" maxlength="100" required></label>
+            <label>E-mail<input name="email" type="email" required></label>
+            <label>Telefone<input name="telefone" maxlength="20"></label>
+            <button class="botao" type="submit">Cadastrar</button>
+        </form>
+    </section>
+
+    <section class="cartao">
+        <p class="vazio" th:if="${clientes.isEmpty()}">Nenhum cliente cadastrado.</p>
+        <table class="tabela" th:unless="${clientes.isEmpty()}">
+            <thead>
+            <tr><th>#</th><th>Nome</th><th>E-mail</th><th>Telefone</th><th></th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${clientes}">
+                <td th:text="${c.id()}"></td>
+                <td><a th:href="@{/web/clientes/{id}(id=${c.id()})}" th:text="${c.nome()}"></a></td>
+                <td th:text="${c.email()}"></td>
+                <td th:text="${c.telefone()}"></td>
+                <td class="acoes">
+                    <a class="botao botao-secundario" th:href="@{/web/clientes/{id}(id=${c.id()})}">Ver chamados</a>
+                    <form th:action="@{/web/clientes/{id}/excluir(id=${c.id()})}" method="post"
+                          onsubmit="return confirm('Excluir este cliente?')">
+                        <button class="botao botao-perigo" type="submit">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

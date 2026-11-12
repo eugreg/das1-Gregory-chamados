@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: head('Chamados')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main class="conteudo">
+    <div th:replace="~{fragments :: alertas}"></div>
+
+    <div class="topo">
+        <h1>Chamados</h1>
+        <a class="botao" th:href="@{/web/chamados/novo}">Abrir chamado</a>
+    </div>
+
+    <section class="cartao">
+        <form class="formulario em-linha" th:action="@{/web/chamados}" method="get">
+            <label>Status
+                <select name="status">
+                    <option value="">Todos</option>
+                    <option th:each="s : ${statusLista}" th:value="${s}" th:text="${s}"
+                            th:selected="${s == filtro.status()}"></option>
+                </select>
+            </label>
+            <label>Prioridade
+                <select name="prioridade">
+                    <option value="">Todas</option>
+                    <option th:each="p : ${prioridades}" th:value="${p}" th:text="${p}"
+                            th:selected="${p == filtro.prioridade()}"></option>
+                </select>
+            </label>
+            <label>Cliente
+                <select name="clienteId">
+                    <option value="">Todos</option>
+                    <option th:each="c : ${clientes}" th:value="${c.id()}" th:text="${c.nome()}"
+                            th:selected="${c.id() == filtro.clienteId()}"></option>
+                </select>
+            </label>
+            <label>Técnico
+                <select name="tecnicoId">
+                    <option value="">Todos</option>
+                    <option th:each="t : ${tecnicos}" th:value="${t.id()}" th:text="${t.nome()}"
+                            th:selected="${t.id() == filtro.tecnicoId()}"></option>
+                </select>
+            </label>
+            <label>Categoria
+                <select name="categoriaId">
+                    <option value="">Todas</option>
+                    <option th:each="c : ${categorias}" th:value="${c.id()}" th:text="${c.nome()}"
+                            th:selected="${c.id() == filtro.categoriaId()}"></option>
+                </select>
+            </label>
+            <button class="botao" type="submit">Filtrar</button>
+            <a class="botao botao-secundario" th:href="@{/web/chamados}">Limpar</a>
+        </form>
+    </section>
+
+    <section class="cartao">
+        <p class="contagem" th:text="|${pagina.totalElements} chamado(s) encontrado(s)|"></p>
+        <p class="vazio" th:if="${pagina.isEmpty()}">Nenhum chamado encontrado.</p>
+        <table class="tabela" th:unless="${pagina.isEmpty()}">
+            <thead>
+            <tr>
+                <th>#</th><th>Título</th><th>Cliente</th><th>Técnico</th><th>Categoria</th>
+                <th>Abertura</th><th>Prioridade</th><th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${pagina.content}">
+                <td th:text="${c.id()}"></td>
+                <td><a th:href="@{/web/chamados/{id}(id=${c.id()})}" th:text="${c.titulo()}"></a></td>
+                <td th:text="${nomesClientes[c.clienteId()]}"></td>
+                <td th:text="${nomesTecnicos[c.tecnicoId()]}"></td>
+                <td th:text="${nomesCategorias[c.categoriaId()]}"></td>
+                <td th:text="${#temporals.format(c.dataAbertura(), 'dd/MM/yyyy')}"></td>
+                <td><span th:replace="~{fragments :: prioridade(${c.prioridade()})}"></span></td>
+                <td><span th:replace="~{fragments :: status(${c.status()})}"></span></td>
+            </tr>
+            </tbody>
+        </table>
+        <nav th:replace="~{fragments :: paginacao(${pagina}, ${urlPaginacao})}"></nav>
+    </section>
+</main>
+</body>
+</html>
