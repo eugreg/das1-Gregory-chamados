@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: head(${cliente.nome()})}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main class="conteudo">
+    <div th:replace="~{fragments :: alertas}"></div>
+
+    <a class="voltar" th:href="@{/web/clientes}">← Clientes</a>
+
+    <div class="topo">
+        <h1 th:text="${cliente.nome()}"></h1>
+        <form th:action="@{/web/clientes/{id}/excluir(id=${cliente.id()})}" method="post"
+              onsubmit="return confirm('Excluir este cliente?')">
+            <button class="botao botao-perigo" type="submit">Excluir</button>
+        </form>
+    </div>
+
+    <section class="cartao">
+        <dl class="dados">
+            <dt>E-mail</dt><dd th:text="${cliente.email()}"></dd>
+            <dt>Telefone</dt><dd th:text="${cliente.telefone() ?: '—'}"></dd>
+        </dl>
+    </section>
+
+    <section class="cartao">
+        <h2>Chamados do cliente</h2>
+        <p class="vazio" th:if="${pagina.isEmpty()}">Este cliente não possui chamados.</p>
+        <table class="tabela" th:unless="${pagina.isEmpty()}">
+            <thead>
+            <tr><th>#</th><th>Título</th><th>Categoria</th><th>Técnico</th><th>Prioridade</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${pagina.content}">
+                <td th:text="${c.id()}"></td>
+                <td><a th:href="@{/web/chamados/{id}(id=${c.id()})}" th:text="${c.titulo()}"></a></td>
+                <td th:text="${nomesCategorias[c.categoriaId()]}"></td>
+                <td th:text="${nomesTecnicos[c.tecnicoId()]}"></td>
+                <td><span th:replace="~{fragments :: prioridade(${c.prioridade()})}"></span></td>
+                <td><span th:replace="~{fragments :: status(${c.status()})}"></span></td>
+            </tr>
+            </tbody>
+        </table>
+        <nav th:replace="~{fragments :: paginacao(${pagina}, '/web/clientes/' + ${cliente.id()})}"></nav>
+    </section>
+</main>
+</body>
+</html>

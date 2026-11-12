@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: head('Categorias')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main class="conteudo">
+    <div th:replace="~{fragments :: alertas}"></div>
+
+    <h1>Categorias</h1>
+
+    <section class="cartao">
+        <h2>Nova categoria</h2>
+        <form class="formulario em-linha" th:action="@{/web/categorias}" method="post">
+            <label>Nome<input name="nome" required></label>
+            <label class="largo">Descrição<input name="descricao"></label>
+            <button class="botao" type="submit">Cadastrar</button>
+        </form>
+    </section>
+
+    <section class="cartao">
+        <p class="vazio" th:if="${categorias.isEmpty()}">Nenhuma categoria cadastrada.</p>
+        <table class="tabela" th:unless="${categorias.isEmpty()}">
+            <thead>
+            <tr><th>#</th><th>Nome</th><th>Descrição</th><th></th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${categorias}">
+                <td th:text="${c.id()}"></td>
+                <td th:text="${c.nome()}"></td>
+                <td th:text="${c.descricao()}"></td>
+                <td class="acoes">
+                    <a class="botao botao-secundario" th:href="@{/web/chamados(categoriaId=${c.id()})}">Chamados</a>
+                    <a class="botao botao-secundario" th:href="@{/web/categorias/{id}(id=${c.id()})}">Editar</a>
+                    <form th:action="@{/web/categorias/{id}/excluir(id=${c.id()})}" method="post"
+                          onsubmit="return confirm('Excluir esta categoria?')">
+                        <button class="botao botao-perigo" type="submit">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="|${titulo} · Chamados|">Chamados</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+
+<header th:fragment="cabecalho" class="cabecalho">
+    <div class="conteudo cabecalho-interno">
+        <a class="marca" th:href="@{/web}">Chamados</a>
+        <nav class="menu">
+            <a th:href="@{/web/chamados}">Chamados</a>
+            <a th:href="@{/web/clientes}">Clientes</a>
+            <a th:href="@{/web/tecnicos}">Técnicos</a>
+            <a th:href="@{/web/categorias}">Categorias</a>
+        </nav>
+    </div>
+</header>
+
+<div th:fragment="alertas">
+    <p class="alerta alerta-sucesso" th:if="${sucesso}" th:text="${sucesso}"></p>
+    <p class="alerta alerta-erro" th:if="${erro}" th:text="${erro}"></p>
+</div>
+
+<span th:fragment="status(valor)" class="selo" th:classappend="|status-${valor}|" th:text="${valor}"></span>
+
+<span th:fragment="prioridade(valor)" class="selo" th:classappend="|prioridade-${valor}|" th:text="${valor}"></span>
+
+<nav th:fragment="paginacao(pagina, url)" class="paginacao" th:if="${pagina.totalPages > 1}">
+    <a class="botao botao-secundario" th:if="${pagina.hasPrevious()}"
+       th:href="@{${url}(page=${pagina.number - 1})}">Anterior</a>
+    <span th:text="|Página ${pagina.number + 1} de ${pagina.totalPages}|"></span>
+    <a class="botao botao-secundario" th:if="${pagina.hasNext()}"
+       th:href="@{${url}(page=${pagina.number + 1})}">Próxima</a>
+</nav>
+
+</body>
+</html>
