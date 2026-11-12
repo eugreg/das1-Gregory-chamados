@@ -1,5 +1,6 @@
 package br.com.sistemas.chamados.service;
 
+import br.com.sistemas.chamados.dto.ChamadosFiltro;
 import br.com.sistemas.chamados.dto.AlterarStatusRequest;
 import br.com.sistemas.chamados.dto.AtribuirTecnicoRequest;
 import br.com.sistemas.chamados.dto.ChamadosDetalheResponse;
@@ -18,10 +19,11 @@ import br.com.sistemas.chamados.repository.ClienteRepository;
 import br.com.sistemas.chamados.repository.CategoriasRepository;
 import br.com.sistemas.chamados.repository.TecnicoRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @Transactional
@@ -66,11 +68,23 @@ public class ChamadosService {
         return ChamadosResponse.de(salvo);
     }
 
-    public List<ChamadosResponse> listar() {
-        return chamadosRepository.findAll()
-                .stream()
-                .map(ChamadosResponse::de)
-                .toList();
+    public Page<ChamadosResponse> listar(ChamadosFiltro filtro, Pageable pageable) {
+        return chamadosRepository.filtrar(
+                filtro.status(),
+                filtro.prioridade(),
+                filtro.clienteId(),
+                filtro.tecnicoId(),
+                filtro.categoriaId(),
+                pageable
+        ).map(ChamadosResponse::de);
+    }
+
+    public Page<ChamadosResponse> listarPorCliente(Long clienteId, Pageable pageable) {
+        if (!clienteRepository.existsById(clienteId)) {
+            throw new RecursoNaoEncontradoException("Cliente " + clienteId + " não encontrado");
+        }
+
+        return listar(ChamadosFiltro.doCliente(clienteId), pageable);
     }
 
     public ChamadosDetalheResponse buscar(Long id) {
